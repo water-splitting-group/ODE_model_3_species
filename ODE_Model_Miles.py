@@ -62,6 +62,33 @@ def ODE_system_VF(y, t, p, cross_section, flux):
 
 	return [ra, rb, rc]
 
+def ODE_system_concentration_dependent_flux(y, t, p, cross_section, flux):
+	'''
+    Thedifference is in this case the flux driving the reaction
+    from B--->C decreases directly as a result of the photons absorbed in A--->B
+    The idea that I had was that each for each individual second that passes 1*quantum yield photons would be lost from the flux
+	'''
+
+	R1 = p[0] * y[1]
+	R2 = p[1] * cross_section * flux * y[0]  
+	R3 = p[2] * cross_section * flux * y[0] * y[1]
+	R4 = p[3] * y[2]
+    
+	ra = R1 - R2 + R4 
+	rb = -R1 + R2 - R3
+	rc = R3 - R4
+
+	return [ra, rb, rc]
+
+def ODE_explicit_rate_law_flexible(ode_system, p, initial_state, t, flux, cross_section, ravel = False):
+
+	sol = odeint(ode_system, initial_state, t, args = (p, cross_section, flux))
+
+	if ravel is True:
+		sol = np.ravel(sol)
+    
+	return sol
+
 def ODE_explicit_rate_law_VF(p, initial_state, t, flux, cross_section, ravel = False):
 
 	sol = odeint(ODE_system_VF, initial_state, t, args = (p, cross_section, flux))
