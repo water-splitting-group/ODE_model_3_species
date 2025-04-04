@@ -9,7 +9,6 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Arial']
 from timeit import default_timer as timer
 import pprint
-from numba import njit
 
 # Test change
 # Branch change
@@ -72,38 +71,58 @@ def ODE_explicit_rate_law_VF(p, initial_state, t, flux, cross_section, ravel = F
     
 	return sol
 
-initial=[10, 0, 0] 
-'''Initial is a Vector of the initial amount of each species A, B, and C'''
+def plotting_function(t, result):
+	
+	plt.figure(0)
+	plt.title("Concentration-Time graph of species A, B, and C")
+	plt.plot(t,result[:, 0], 'r--', label=r'[A] where $\frac{d[A]}{dt}=p_{BA}[B]-p_{AB}\sigma\phi[A]+p_{CA}[C]$')
+	plt.plot(t,result[:, 1], 'y--', label=r'[B] where $\frac{d[B]}{dt}=-p_{BA}[B]+p_{AB}\sigma\phi[A]-p_{BC}\sigma\phi[B]$')
+	plt.plot(t,result[:, 2], 'b--', label=r'[C] where $\frac{d[C]}{dt}=p_{BC}\sigma\phi[B]-p_{CA}[C]$')
+	plt.legend(loc='best')
+	plt.ylabel('Concentration') 
+	'''Concentration currently framed like percentage because I found that intuitive'''
+	plt.xlabel('Time')
+	'''Seconds? Hours? Fortnights?'''
 
-t=np.linspace(0, 7, 200)
-
-odds=[0.03, 0.34, 0.24, 0.1]
-'''I was having a little bit of trouble knowing exactly where to find good theoretical probabilities,
- so I chose values that are somewhat arbitray. I would like to better know where I could get sensible values from'''
- 
-flux_phi=10
-cross_section=0.2
-
-result=ODE_explicit_rate_law(odds, initial, t, flux_phi, cross_section)
-
-plt.figure(0)
-plt.title("Concentration-Time graph of species A, B, and C")
-plt.plot(t,result[:, 0], 'r--', label=r'[A] where $\frac{d[A]}{dt}=p_{BA}[B]-p_{AB}\sigma\phi[A]+p_{CA}[C]$')
-plt.plot(t,result[:, 1], 'y--', label=r'[B] where $\frac{d[B]}{dt}=-p_{BA}[B]+p_{AB}\sigma\phi[A]-p_{BC}\sigma\phi[B]$')
-plt.plot(t,result[:, 2], 'b--', label=r'[C] where $\frac{d[C]}{dt}=p_{BC}\sigma\phi[B]-p_{CA}[C]$')
-plt.legend(loc='best')
-plt.ylabel('Concentration') 
-'''Concentration currently framed like percentage because I found that intuitive'''
-plt.xlabel('Time')
-'''Seconds? Hours? Fortnights?'''
+	return None
 
 
 
 
-result_VF=ODE_explicit_rate_law(odds, initial, t, flux_phi, cross_section)
-plt.figure(1)
-plt.title("Concentration-Time of Species C where the flux varies based on [A]")
-plt.plot(t,result[:, 2], 'g--', label=r'[C] where $\frac{d[C]}{dt}=p_{BC}\sigma\phi(1-p_{AB}[A]*t)[B]-p_{CA}[C]$')
-plt.legend(loc='best')
-plt.ylabel('Concentration') 
-plt.xlabel('Time')
+if __name__ == "__main__":
+
+	initial=[10, 0, 0] 
+	'''Initial is a Vector of the initial amount of each species A, B, and C'''
+
+	t=np.linspace(0, 7, 200)
+
+	odds=[0.03, 0.34, 0.24, 0.1]
+	'''I was having a little bit of trouble knowing exactly where to find good theoretical probabilities,
+	so I chose values that are somewhat arbitray. I would like to better know where I could get sensible values from'''
+	
+	flux_phi=10
+	cross_section=0.2
+
+	result=ODE_explicit_rate_law(odds, initial, t, flux_phi, cross_section)
+
+	plt.figure(0)
+	plt.title("Concentration-Time graph of species A, B, and C")
+	plt.plot(t,result[:, 0], 'r--', label=r'[A] where $\frac{d[A]}{dt}=p_{BA}[B]-p_{AB}\sigma\phi[A]+p_{CA}[C]$')
+	plt.plot(t,result[:, 1], 'y--', label=r'[B] where $\frac{d[B]}{dt}=-p_{BA}[B]+p_{AB}\sigma\phi[A]-p_{BC}\sigma\phi[B]$')
+	plt.plot(t,result[:, 2], 'b--', label=r'[C] where $\frac{d[C]}{dt}=p_{BC}\sigma\phi[B]-p_{CA}[C]$')
+	plt.legend(loc='best')
+	plt.ylabel('Concentration') 
+	'''Concentration currently framed like percentage because I found that intuitive'''
+	plt.xlabel('Time')
+	'''Seconds? Hours? Fortnights?'''
+
+
+
+
+	result_VF=ODE_explicit_rate_law(odds, initial, t, flux_phi, cross_section)
+	plt.figure(1)
+	plt.title("Concentration-Time of Species C where the flux varies based on [A]")
+	plt.plot(t,result[:, 2], 'g--', label=r'[C] where $\frac{d[C]}{dt}=p_{BC}\sigma\phi(1-p_{AB}[A]*t)[B]-p_{CA}[C]$')
+	plt.legend(loc='best')
+	plt.ylabel('Concentration') 
+	plt.xlabel('Time')
